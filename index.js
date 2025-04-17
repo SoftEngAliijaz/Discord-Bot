@@ -1,6 +1,4 @@
 const { Client, GatewayIntentBits } = require("discord.js");
-const DISCORD_BOT_TOKEN =
-  "MTM2MjU1NzI2NDgyODgyNTgxMg.GeDFp6.JkzTC4HI7A0SQnOVJ8Ql7YQUhY9sBDoMgNR9MA";
 
 const client = new Client({
   intents: [
@@ -11,7 +9,7 @@ const client = new Client({
 });
 
 client
-  .login(process.env.DISCORD_BOT_TOKEN || DISCORD_BOT_TOKEN)
+  .login(process.env.DISCORD_BOT_TOKEN)
   .then(() => {
     console.log("Bot is online!");
   })

@@ -48,8 +48,7 @@ const commands = [
 ];
 
 const rest = new REST({ version: "10" }).setToken(
-  process.env.DISCORD_BOT_TOKEN ||
-    "MTM2MjU1NzI2NDgyODgyNTgxMg.GeDFp6.JkzTC4HI7A0SQnOVJ8Ql7YQUhY9sBDoMgNR9MA"
+  process.env.DISCORD_BOT_TOKEN
 );
 
 (async () => {
