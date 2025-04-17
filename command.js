@@ -1,51 +1,38 @@
 const { REST, Routes } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config();
 
-const commands = [
-  {
-    name: "ping",
-    description: "Replies with Pong!",
-  },
-  {
-    name: "hello",
-    description: "Replies with Hello, World!",
-  },
-  {
-    name: "time",
-    description: "Replies with the current server time.",
-  },
-  {
-    name: "weather",
-    description: "Provides the current weather information.",
-  },
-  {
-    name: "joke",
-    description: "Tells you a random joke.",
-  },
-  {
-    name: "quote",
-    description: "Shares an inspirational quote.",
-  },
-  {
-    name: "roll",
-    description: "Rolls a dice and gives you a random number.",
-  },
-  {
-    name: "flip",
-    description: "Flips a coin and shows heads or tails.",
-  },
-  {
-    name: "userinfo",
-    description: "Displays information about your user profile.",
-  },
-  {
-    name: "serverinfo",
-    description: "Displays information about the server.",
-  },
-  {
-    name: "help",
-    description: "Provides a list of available commands.",
-  },
-];
+if (!process.env.DISCORD_BOT_TOKEN || !process.env.CLIENT_ID) {
+  console.error(
+    "Missing required environment variables: DISCORD_BOT_TOKEN or CLIENT_ID"
+  );
+  process.exit(1);
+}
+
+const commands = [];
+const commandsPath = path.join(__dirname, "commands");
+
+if (fs.existsSync(commandsPath)) {
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith(".js"));
+
+  for (const file of commandFiles) {
+    const command = require(path.join(commandsPath, file));
+    if (command.name && command.description) {
+      commands.push({ name: command.name, description: command.description });
+    } else {
+      console.warn(`Command file "${file}" is missing a name or description.`);
+    }
+  }
+} else {
+  console.warn("No 'commands' folder found. Using default commands.");
+  commands.push(
+    { name: "ping", description: "Replies with Pong!" },
+    { name: "help", description: "Provides a list of available commands." }
+  );
+}
 
 const rest = new REST({ version: "10" }).setToken(
   process.env.DISCORD_BOT_TOKEN
@@ -53,14 +40,14 @@ const rest = new REST({ version: "10" }).setToken(
 
 (async () => {
   try {
-    console.log("Started refreshing application (/) commands.");
+    console.log("Started refreshing application (/) commands...");
 
-    await rest.put(Routes.applicationCommands("1362557264828825812"), {
+    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
       body: commands,
     });
 
     console.log("Successfully reloaded application (/) commands.");
   } catch (error) {
-    console.error(error);
+    console.error("Failed to reload application (/) commands:", error);
   }
 })();
